@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q團長 12/30 午餐團 🌿</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 健康餐風格配色 */
+        body { background-color: #fdfbf7; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; color: #4b5563; }
+        .mobile-container { max-width: 420px; margin: 0 auto; background: #ffffff; min-height: 100vh; position: relative; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        
+        /* 底部固定欄 */
+        .sticky-bottom { position: fixed; bottom: 0; left: 0; right: 0; max-width: 420px; margin: 0 auto; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-top: 1px solid #e5e7eb; padding: 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 40; }
+        
+        /* 載入動畫 */
+        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #10b981; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* 自定義按鈕樣式 */
+        .btn-primary { background: #f97316; color: white; transition: all 0.2s; } 
+        .btn-primary:hover { background: #ea580c; }
+        .btn-outline { border: 2px solid #10b981; color: #059669; background: #ecfdf5; } 
+        .btn-outline:hover { background: #d1fae5; }
+        
+        /* 選項卡樣式 */
+        .radio-card input:checked + div { border-color: #10b981; background-color: #ecfdf5; color: #065f46; ring: 2px solid #10b981; }
+        .radio-card div { transition: all 0.2s; }
+        .recommend-badge { position: absolute; top: -10px; right: -5px; background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container pb-36">
+    <header class="bg-emerald-600 text-white p-5 sticky top-0 z-30 shadow-sm rounded-b-2xl">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-xl font-bold tracking-wide">🍱 12/30 午餐團</h1>
+                <p class="text-emerald-100 text-sm mt-1">吃得健康，付款輕鬆</p>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-emerald-200">12/29 16:00 截單</div>
+                <div id="timer" class="font-mono font-bold text-yellow-300 text-lg">計算中...</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="px-6 pt-6" id="instruction-card">
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+            <h3 class="font-bold text-gray-700 mb-2 border-l-4 border-emerald-500 pl-2">💡 操作三步驟</h3>
+            <ol class="text-sm text-gray-600 space-y-2 list-decimal list-inside">
+                <li>點擊下方按鈕去店家網站點餐。</li>
+                <li>記下您的<b class="text-orange-500">總金額</b>。</li>
+                <li>回來這裡填金額，<b class="text-emerald-600">盡量以匯款為主</b>，方便團長對帳喔！🙏</li>
+            </ol>
+        </div>
+    </div>
+
+    <div id="form-container">
+        <div class="p-6">
+            <div class="bg-orange-50 rounded-xl p-5 border border-orange-100 shadow-sm">
+                <h2 class="font-bold text-gray-800 text-lg mb-2 flex items-center">
+                    <span class="bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-2">1</span>
+                    前往店家點餐
+                </h2>
+                <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                    請先至店家頁面挑選餐點並送出訂單。
+                    <br><span class="text-orange-600 font-bold">⚠️ 請務必記住您的「總金額」！</span>
+                </p>
+                <a href=" https://ddc.ai/JxyYMMR" target="_blank" class="block w-full text-center btn-outline font-bold py-3 rounded-xl shadow-sm transition">
+                    🥗 開啟點餐菜單
+                </a>
+            </div>
+        </div>
+
+        <div class="px-6 pb-6 space-y-5">
+            <div class="flex items-center">
+                <span class="bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-2">2</span>
+                <h2 class="font-bold text-gray-800 text-lg">回報金額與付款</h2>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">您剛剛點了多少錢？ <span class="text-red-400">*</span></label>
+                <div class="relative rounded-md shadow-sm">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                        <span class="text-gray-500 font-bold">$</span>
+                    </div>
+                    <input type="number" id="manual-price" class="block w-full rounded-xl border-gray-200 pl-8 p-4 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none text-2xl font-bold text-gray-800 placeholder-gray-300 transition" placeholder="0">
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">您的姓名 <span class="text-red-400">*</span></label>
+                    <input type="text" id="username" placeholder="請與點餐網站填寫一致" class="block w-full rounded-lg border-gray-200 p-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">付款方式 <span class="text-red-400">*</span></label>
+                    
+                    <div class="space-y-3">
+                        <label class="cursor-pointer radio-card block relative">
+                            <input type="radio" name="payment_method" value="transfer" class="hidden" checked>
+                            <div class="border border-gray-200 rounded-lg p-3 flex items-center hover:bg-gray-50">
+                                <div class="text-2xl mr-3">📲</div>
+                                <div class="text-left">
+                                    <div class="text-sm font-bold text-gray-800">銀行轉帳</div>
+                                    <div class="text-xs text-emerald-600 font-bold">✨ 推薦！團長好對帳</div>
+                                </div>
+                            </div>
+                            <div class="recommend-badge">推</div>
+                        </label>
+
+                        <label class="cursor-pointer radio-card block">
+                            <input type="radio" name="payment_method" value="cash" class="hidden">
+                            <div class="border border-gray-200 rounded-lg p-3 flex items-center hover:bg-gray-50">
+                                <div class="text-2xl mr-3">💵</div>
+                                <div class="text-left">
+                                    <div class="text-sm font-bold text-gray-800">給現金</div>
+                                    <div class="text-xs text-gray-400">請親自交給 Q 團長</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-view" class="hidden p-6 animate-slide-up">
+        </div>
+
+    <div class="sticky-bottom" id="footer-bar">
+        <button id="submit-btn" class="w-full btn-primary py-4 rounded-xl font-bold shadow-lg text-lg flex justify-center items-center">
+            確認金額，送出
+        </button>
+    </div>
+
+    <div id="payment-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-40 z-50 flex items-end justify-center backdrop-blur-sm">
+        <div class="bg-white w-full max-w-[420px] rounded-t-3xl p-8 animate-slide-up shadow-2xl">
+            <div id="payment-content"></div>
+            <button onclick="document.getElementById('payment-modal').classList.add('hidden')" class="mt-6 w-full text-gray-400 text-sm hover:text-gray-600">關閉視窗 (保留資訊)</button>
+        </div>
+    </div>
+    
+    <div id="admin-view" class="hidden fixed inset-0 bg-gray-50 z-50 overflow-y-auto mobile-container">
+        <header class="bg-gray-800 text-white p-4 sticky top-0 flex justify-between items-center shadow-lg">
+            <h1 class="font-bold flex items-center">🕵️ Q團長後台 <span class="ml-2 text-xs bg-gray-700 px-2 py-0.5 rounded text-gray-300">管理模式</span></h1>
+            <button onclick="toggleAdmin()" class="text-xs bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded transition">關閉</button>
+        </header>
+        <div class="p-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">應收總額</div>
+                    <div class="text-2xl font-bold text-gray-800" id="admin-total-receivable">$0</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">訂單數</div>
+                    <div class="text-2xl font-bold text-gray-800" id="admin-order-count">0</div>
+                </div>
+            </div>
+            
+            <h3 class="font-bold text-gray-700 mb-3 pl-1">帳務列表</h3>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-500 font-medium">
+                        <tr>
+                            <th class="p-3">狀態</th>
+                            <th class="p-3">姓名/金額</th>
+                            <th class="p-3 text-right">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body" class="divide-y divide-gray-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-28 right-5 z-30">
+        <button onclick="toggleAdmin()" class="bg-gray-800 text-white w-12 h-12 rounded-full shadow-xl flex items-center justify-center opacity-40 hover:opacity-100 transition-all transform hover:scale-110">
+            ⚙️
+        </button>
+    </div>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 🔴 請填入您的 Firebase Config
+    const firebaseConfig = {
+  apiKey: "AIzaSyCjrm6t1v9wcOoEWzygcPgTvl41Fi1IkAM",
+  authDomain: "q-lunch.firebaseapp.com",
+  projectId: "q-lunch",
+  storageBucket: "q-lunch.firebasestorage.app",
+  messagingSenderId: "125719980050",
+  appId: "1:125719980050:web:d0c5d825d22887cd1ad0cb",
+  measurementId: "G-6SZ29EDZ4R"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 銀行資訊
+    const bankName = "渣打銀行 (052)";
+    const bankAccount = "08720000262256";
+    const formattedAccount = "0872-0000-2622-56"; // 已修正格式
+
+    // 送單邏輯
+    const submitBtn = document.getElementById("submit-btn");
+    
+    submitBtn.addEventListener('click', async () => {
+        const name = document.getElementById("username").value.trim();
+        const priceInput = document.getElementById("manual-price").value;
+        const total = parseInt(priceInput);
+        const method = document.querySelector('input[name="payment_method"]:checked').value;
+
+        if (!total || total <= 0) return alert("請輸入金額");
+        if (!name) return alert("請輸入您的姓名");
+
+        const orderData = {
+            name: name,
+            total: total,
+            method: method, // 紀錄付款方式
+            status: 'pending', 
+            last5: '',
+            createdAt: serverTimestamp()
+        };
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loader"></span> 處理中...';
+
+        try {
+            const docRef = await addDoc(collection(db, "orders"), orderData);
+            
+            // 隱藏表單
+            document.getElementById('form-container').classList.add('hidden');
+            document.getElementById('instruction-card').classList.add('hidden');
+            document.getElementById('footer-bar').classList.add('hidden');
+
+            // 渲染成功畫面
+            renderSuccessView(docRef.id, total, name, method);
+            
+            // 顯示彈窗
+            showPaymentModal(docRef.id, total, name, method);
+
+        } catch (e) {
+            console.error("Error: ", e);
+            alert("系統忙碌中，請稍後再試");
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '確認金額，送出';
+        }
+    });
+
+    // 渲染成功後的靜態畫面
+    function renderSuccessView(orderId, total, name, method) {
+        const successView = document.getElementById('success-view');
+        let contentHtml = '';
+
+        if (method === 'transfer') {
+            // 轉帳
+            contentHtml = `
+                <div class="text-center mb-6">
+                    <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-4xl">✅</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">訂單已送出</h2>
+                    <p class="text-gray-500 mt-2">請依照下方資訊進行轉帳</p>
+                </div>
+                <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 mb-6 relative shadow-sm">
+                    <p class="text-xs text-emerald-600 font-bold uppercase tracking-wide mb-1">應付金額</p>
+                    <div class="text-3xl font-bold text-emerald-700 mb-4">$${total}</div>
+                    <div class="border-t border-emerald-200 my-3"></div>
+                    <p class="text-xs text-emerald-600 font-bold uppercase tracking-wide mb-1">${bankName}</p>
+                    <div class="flex items-center justify-between">
+                        <div class="font-mono font-bold text-lg text-gray-800 break-all">${formattedAccount}</div>
+                        <button onclick="navigator.clipboard.writeText('${bankAccount}'); alert('帳號已複製！')" class="text-emerald-700 bg-white border border-emerald-200 hover:bg-emerald-100 px-2 py-1 rounded text-sm font-bold transition ml-2">複製</button>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">已轉帳？請輸入帳號後五碼：</label>
+                    <div class="flex space-x-3">
+                        <input type="text" id="main-last5-input" placeholder="12345" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-center font-mono focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <button id="main-report-btn" class="bg-gray-800 text-white px-6 py-3 rounded-lg font-bold shadow hover:bg-gray-700 transition">回報</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            // 現金
+            contentHtml = `
+                <div class="text-center mb-6">
+                    <div class="bg-orange-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-4xl">💵</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">訂單已送出</h2>
+                    <p class="text-gray-500 mt-2">請準備好現金</p>
+                </div>
+                <div class="bg-orange-50 p-6 rounded-2xl border border-orange-100 mb-6 text-center shadow-sm">
+                    <p class="text-sm text-orange-600 font-bold uppercase tracking-wide mb-2">應付金額</p>
+                    <div class="text-4xl font-bold text-orange-700 mb-4">$${total}</div>
+                    <p class="text-gray-600 text-sm">請記得將現金交給 <b class="text-gray-800">Q 團長</b></p>
+                </div>
+                <div class="text-center text-sm text-gray-400">
+                    團長收款後會在後台標記為「已核對」
+                </div>
+            `;
+        }
+        
+        successView.innerHTML = contentHtml;
+        successView.classList.remove('hidden');
+
+        // 如果是轉帳，綁定按鈕
+        if (method === 'transfer') {
+            document.getElementById("main-report-btn").onclick = () => submitReport(orderId, 'main-last5-input');
+        }
+    }
+
+    // 顯示彈窗
+    function showPaymentModal(orderId, total, name, method) {
+        const modal = document.getElementById("payment-modal");
+        const content = document.getElementById("payment-content");
+        
+        let modalHtml = '';
+        
+        if (method === 'transfer') {
+            modalHtml = `
+                <div class="text-center mb-6">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-3xl">🎉</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">登記成功！</h2>
+                    <p class="text-gray-500 mt-1">嗨 ${name}，請轉帳 <b class="text-emerald-600 text-lg">$${total}</b></p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 relative">
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wide mb-1">${bankName}</p>
+                    <div class="flex items-center justify-between">
+                        <div class="font-mono font-bold text-lg text-gray-800 break-all">${formattedAccount}</div>
+                        <button onclick="navigator.clipboard.writeText('${bankAccount}'); alert('帳號已複製！')" class="text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-lg text-sm font-bold transition ml-1">複製</button>
+                    </div>
+                </div>
+                <div class="border-t border-gray-100 pt-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">已轉帳？請輸入帳號後五碼：</label>
+                    <div class="flex space-x-3">
+                        <input type="text" id="modal-last5-input" placeholder="12345" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-center font-mono focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <button id="modal-report-btn" class="bg-gray-800 text-white px-6 py-3 rounded-lg font-bold shadow hover:bg-gray-700 transition">回報</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            // 現金
+            modalHtml = `
+                <div class="text-center mb-6">
+                    <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-3xl">🤝</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">登記成功！</h2>
+                    <p class="text-gray-500 mt-1">嗨 ${name}，請準備現金 <b class="text-orange-600 text-lg">$${total}</b></p>
+                </div>
+                <div class="bg-orange-50 p-5 rounded-xl border border-orange-100 mb-4 text-center">
+                    <p class="text-gray-700 font-bold">請記得將現金交給 Q 團長</p>
+                    <p class="text-xs text-gray-400 mt-1">一手交錢，一手交飯</p>
+                </div>
+                <button onclick="document.getElementById('payment-modal').classList.add('hidden')" class="w-full bg-gray-800 text-white py-3 rounded-lg font-bold">收到，我會去付款</button>
+            `;
+        }
+
+        content.innerHTML = modalHtml;
+        modal.classList.remove("hidden");
+
+        if (method === 'transfer') {
+            document.getElementById("modal-report-btn").onclick = () => submitReport(orderId, 'modal-last5-input');
+        }
+    }
+
+    // 回報後五碼邏輯
+    async function submitReport(orderId, inputId) {
+        const last5 = document.getElementById(inputId).value;
+        if(!last5) return alert("請輸入內容");
+        
+        try {
+            const orderRef = doc(db, "orders", orderId);
+            await updateDoc(orderRef, { last5: last5, status: 'review' });
+            alert("收到！感謝您的配合 🙏");
+            window.location.reload(); 
+        } catch (e) { alert("回報失敗"); }
+    }
+
+    // 後台管理邏輯
+    let unsubscribeAdmin = null;
+    window.toggleAdmin = () => {
+        const view = document.getElementById("admin-view");
+        const isHidden = view.classList.contains("hidden");
+        
+        if (isHidden) {
+            const pwd = prompt("請輸入團長密碼：");
+            if (pwd !== "22") { alert("密碼錯誤！"); return; }
+
+            view.classList.remove("hidden");
+            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+            
+            unsubscribeAdmin = onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById("admin-table-body");
+                tbody.innerHTML = "";
+                let totalReceivable = 0;
+                let count = 0;
+
+                snapshot.forEach((item) => {
+                    const data = item.data();
+                    const docId = item.id;
+                    count++;
+                    totalReceivable += data.total;
+
+                    // 判斷狀態
+                    let statusBadge = '';
+                    if(data.status === 'pending') statusBadge = '<span class="inline-block px-2 py-1 bg-red-100 text-red-600 text-xs rounded-md font-bold">未付</span>';
+                    else if(data.status === 'review') statusBadge = '<span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-md font-bold animate-pulse">待查</span>';
+                    else if(data.status === 'paid') statusBadge = '<span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs rounded-md font-bold">已核</span>';
+
+                    // 付款方式 icon
+                    let methodIcon = '';
+                    if (data.method === 'cash') methodIcon = '💵 現金';
+                    else methodIcon = '📲 轉帳';
+
+                    // 確認按鈕 (現金模式的未付單也需要可以直接核對)
+                    const showVerify = (data.status === 'review' || (data.method === 'cash' && data.status === 'pending'));
+                    const verifyBtn = showVerify 
+                        ? `<button onclick="verifyOrder('${docId}')" class="text-blue-600 font-bold text-xs underline mr-3">確認收款</button>` 
+                        : '';
+
+                    // 顯示資訊
+                    let infoText = '';
+                    if (data.last5) {
+                        infoText = `<span class="font-mono bg-gray-100 px-1 rounded text-gray-600">末5:${data.last5}</span>`;
+                    }
+
+                    const row = `
+                        <tr class="group hover:bg-gray-50 transition">
+                            <td class="p-3 align-top border-b border-gray-50">
+                                ${statusBadge}
+                                <div class="text-[10px] text-gray-400 mt-1">${methodIcon}</div>
+                            </td>
+                            <td class="p-3 align-top border-b border-gray-50">
+                                <div class="font-bold text-gray-800">${data.name}</div>
+                                <div class="flex items-center text-xs mt-1">
+                                    <span class="text-gray-500 mr-2">金額 $${data.total}</span>
+                                    ${infoText}
+                                </div>
+                            </td>
+                            <td class="p-3 text-right align-middle border-b border-gray-50">
+                                ${verifyBtn}
+                                <button onclick="deleteOrder('${docId}', '${data.name}')" class="text-gray-300 hover:text-red-500 transition p-1" title="刪除此單">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+
+                document.getElementById("admin-total-receivable").innerText = `$${totalReceivable}`;
+                document.getElementById("admin-order-count").innerText = count;
+            });
+        } else {
+            view.classList.add("hidden");
+            if(unsubscribeAdmin) unsubscribeAdmin();
+        }
+    };
+
+    window.verifyOrder = async (id) => {
+        try { await updateDoc(doc(db, "orders", id), { status: 'paid' }); } 
+        catch(e) { alert("更新失敗"); }
+    };
+
+    window.deleteOrder = async (id, name) => {
+        if(confirm(`確定要刪除「${name}」的訂單嗎？此動作無法復原。`)) {
+            try { await deleteDoc(doc(db, "orders", id)); } 
+            catch(e) { alert("刪除失敗"); }
+        }
+    };
+
+    // 倒數計時器 (12/29 16:00)
+    const deadline = new Date("2025-12-29T16:00:00").getTime();
+    setInterval(() => {
+        const now = new Date().getTime();
+        let diff = deadline - now;
+        if(diff < 0) {
+            document.getElementById("timer").innerText = "已截止";
+            const btn = document.getElementById("submit-btn");
+            if(btn && !btn.disabled) { // 只在未送出時鎖定
+                btn.disabled = true;
+                btn.innerText = "已截單，下次請早";
+                btn.classList.add("bg-gray-400");
+                btn.classList.remove("btn-primary");
+            }
+        } else {
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById("timer").innerText = `${h}時${m.toString().padStart(2,'0')}分${s.toString().padStart(2,'0')}秒`;
+        }
+    }, 1000);
+
+</script>
+
+</body>
+</html>
